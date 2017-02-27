@@ -12,6 +12,12 @@
                 "query": {
                     "type": "string",
                     "optional": false
+                },
+                "params": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

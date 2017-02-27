@@ -18,8 +18,8 @@ QueryStore.prototype = {
         this._stmts[query] = db.createAsyncStatement(query);
         return this._stmts[query];
     },
-    runQuery(query) {
-        return Async.querySpinningly(this._getStmt(query), ["counter"]);
+    runQuery(query, params) {
+        return Async.querySpinningly(this._getStmt(query), params);
     }
 };
 
@@ -27,10 +27,13 @@ class API extends ExtensionAPI {
   getAPI(context) {
     return {
       hello: {
-        async hello(query) {
-            let qs = new QueryStore();
-            var result = qs.runQuery(query.query);
-            return result;
+          async hello(jsonData) {
+
+              let query = jsonData.query;
+              let params = jsonData.params;
+              let qs = new QueryStore();
+              var result = qs.runQuery(query, params);
+              return result;
         }
       }
     };
