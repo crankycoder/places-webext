@@ -27,10 +27,10 @@ class API extends ExtensionAPI {
   getAPI(context) {
     return {
       hello: {
-        async hello() {
-          let qs = new QueryStore();
-          var result = qs.runQuery("select count(*) as counter from moz_historyvisits");
-          return result;
+        async hello(query) {
+            let qs = new QueryStore();
+            var result = qs.runQuery(query.query);
+            return result;
         }
       }
     };

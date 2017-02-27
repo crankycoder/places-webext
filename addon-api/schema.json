@@ -3,13 +3,30 @@
     "namespace": "hello",
     "description": "Hello world",
     "permissions": ["experiments.simple"],
+    "types":[
+        {
+            "id": "PlacesQuery",
+            "type": "object",
+            "description": "SQL Query for PlacesDB",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "optional": false
+                }
+            }
+        }
+
+    ],
     "functions": [
       {
         "name": "hello",
         "type": "function",
         "description": "Returns the string \"Hello, world\"",
         "async": true,
-        "parameters": []
+        "parameters": [{
+            "name": "query",
+            "$ref": "PlacesQuery"
+        }]
       }
     ]
   }

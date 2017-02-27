@@ -1,10 +1,10 @@
-browser.hello.hello().then(
+browser.hello.hello({query: "select count(*) as counter from moz_historyvisits"}).then(
     function(results) {
         for (var i = 0; i < results.length; i++) {
-            console.log(results[i].counter);
+            console.log("Row foo: " + results[i].counter);
         }
     },
     function(reason) {
-        console.log(reason); // Fail!
+        console.log("failure resason: " + reason); // Fail!
     }
 );
