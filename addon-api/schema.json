@@ -1,0 +1,16 @@
+[
+  {
+    "namespace": "hello",
+    "description": "Hello world",
+    "permissions": ["experiments.simple"],
+    "functions": [
+      {
+        "name": "hello",
+        "type": "function",
+        "description": "Returns the string \"Hello, world\"",
+        "async": true,
+        "parameters": []
+      }
+    ]
+  }
+]
