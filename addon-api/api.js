@@ -29,8 +29,8 @@ class API extends ExtensionAPI {
       hello: {
         async hello() {
           let qs = new QueryStore();
-          let result = qs.runQuery("select count(*) as counter from moz_historyvisits");
-          return result[0].counter;
+          var result = qs.runQuery("select count(*) as counter from moz_historyvisits");
+          return result;
         }
       }
     };

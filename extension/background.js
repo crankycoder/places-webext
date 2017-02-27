@@ -1,3 +1,10 @@
 browser.hello.hello().then(
-  message => console.log(`hello sez: "${message}"`)
+    function(results) {
+        for (var i = 0; i < results.length; i++) {
+            console.log(results[i].counter);
+        }
+    },
+    function(reason) {
+        console.log(reason); // Fail!
+    }
 );
