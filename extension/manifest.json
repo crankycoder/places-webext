@@ -3,8 +3,22 @@
   "name": "hello test",
   "description": "test the simple experiment",
   "version": "1.0",
-
   "background": { "scripts": ["background.js"] },
-
-  "permissions": [ "experiments.simple" ]
+  "permissions": ["experiments.simple",
+                  "webRequest", "<all_urls>",
+                  "cookies","<all_urls>",
+                  "webNavigation","<all_urls>",
+                  // Firefox doesn't support the geolocation permission yet
+                  // "geolocation",
+                  "tabs"],
+  "browser_action": {
+      "browser_style": true,
+      "default_icon": {
+          "16": "icons/icon-16.png",
+          "32": "icons/icon-32.png",
+          "64": "icons/icon-64.png"
+      },
+      "default_title": "Heatmap Settings",
+      "default_popup": "popup/groupspanel.html"
+  }
 }
