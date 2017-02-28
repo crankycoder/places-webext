@@ -2,8 +2,16 @@ const {classes: Cc, interfaces: Ci, results: Cr, utils: Cu} = Components;
 
 Cu.import("resource://gre/modules/PlacesUtils.jsm", this);
 Cu.import("resource://services-common/async.js");
+Cu.import("resource://gre/modules/Services.jsm");
 
 function QueryStore() {
+    Services.obs.addObserver(() => {
+        for (let query in this._stmts) {
+            let stmt = this._stmts[query];
+            stmt.finalize();
+        }
+        this._stmts = {};
+    }, "places-shutdown", false);
 }
 
 QueryStore.prototype = {
