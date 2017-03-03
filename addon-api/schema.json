@@ -1,6 +1,6 @@
 [
   {
-    "namespace": "hello",
+    "namespace": "placesdb",
     "description": "Hello world",
     "permissions": ["experiments.simple"],
     "types":[
@@ -25,7 +25,7 @@
     ],
     "functions": [
       {
-        "name": "hello",
+        "name": "query",
         "type": "function",
         "description": "Returns the string \"Hello, world\"",
         "async": true,

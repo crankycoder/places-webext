@@ -34,8 +34,8 @@ QueryStore.prototype = {
 class API extends ExtensionAPI {
   getAPI(context) {
     return {
-      hello: {
-          async hello(jsonData) {
+      placesdb: {
+          async query(jsonData) {
 
               let query = jsonData.query;
               let params = jsonData.params;
