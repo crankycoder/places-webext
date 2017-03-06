@@ -1,10 +1,28 @@
 class Site extends React.Component {
     render() {
+        let favicon = React.DOM.img({
+            alt: "",
+            className: "tab-icon",
+            src: this.props.site.favicon
+        });
+        let siteSpan = React.DOM.span({className: "tab-title"}, this.props.site.title)
+
+
         return (
-            <li className="tab">
-                <img alt="" className="tab-icon" src="{this.props.site.favicon}"/>
-                <span className="tab-title">{this.props.site.title}|{this.props.site.url}</span>
-            </li>
+          React.DOM.li(
+            {
+              className: "tab",
+                onClick: (event) => {
+                    event.stopPropagation();
+
+                    let site = this.props.site;
+                    console.log("URL is: " + site.url);
+                    console.log("Got click event");
+                }
+            },
+            favicon,
+            siteSpan
+          )
         );
     }
 }

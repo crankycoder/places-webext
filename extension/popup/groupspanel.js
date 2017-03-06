@@ -20,18 +20,25 @@ var Site = function (_React$Component) {
     _createClass(Site, [{
         key: "render",
         value: function render() {
-            return React.createElement(
-                "li",
-                { className: "tab" },
-                React.createElement("img", { alt: "", className: "tab-icon", src: "{this.props.site.favicon}" }),
-                React.createElement(
-                    "span",
-                    { className: "tab-title" },
-                    this.props.site.title,
-                    "|",
-                    this.props.site.url
-                )
-            );
+            var _this2 = this;
+
+            var favicon = React.DOM.img({
+                alt: "",
+                className: "tab-icon",
+                src: this.props.site.favicon
+            });
+            var siteSpan = React.DOM.span({ className: "tab-title" }, this.props.site.title);
+
+            return React.DOM.li({
+                className: "tab",
+                onClick: function onClick(event) {
+                    event.stopPropagation();
+
+                    var site = _this2.props.site;
+                    console.log("URL is: " + site.url);
+                    console.log("Got click event");
+                }
+            }, favicon, siteSpan);
         }
     }]);
 
