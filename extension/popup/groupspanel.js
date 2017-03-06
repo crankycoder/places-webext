@@ -156,31 +156,110 @@ var SearchBar = function (_React$Component4) {
   return SearchBar;
 }(React.Component);
 
-var FilterableProductTable = function (_React$Component5) {
-  _inherits(FilterableProductTable, _React$Component5);
+var Site = function (_React$Component5) {
+  _inherits(Site, _React$Component5);
 
-  function FilterableProductTable() {
-    _classCallCheck(this, FilterableProductTable);
+  function Site() {
+    _classCallCheck(this, Site);
 
-    return _possibleConstructorReturn(this, (FilterableProductTable.__proto__ || Object.getPrototypeOf(FilterableProductTable)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (Site.__proto__ || Object.getPrototypeOf(Site)).apply(this, arguments));
   }
 
-  _createClass(FilterableProductTable, [{
+  _createClass(Site, [{
     key: "render",
     value: function render() {
       return React.createElement(
-        "div",
-        null,
-        React.createElement(SearchBar, null),
-        React.createElement(ProductTable, { products: this.props.products })
+        "li",
+        { className: "tab" },
+        React.createElement("img", { alt: "", className: "tab-icon", src: "{this.props.site.favicon}" }),
+        React.createElement(
+          "span",
+          { className: "tab-title" },
+          this.props.site.title,
+          "|",
+          this.props.site.url
+        )
       );
     }
   }]);
 
-  return FilterableProductTable;
+  return Site;
 }(React.Component);
 
-var PRODUCTS = [{ category: 'Sporting Goods', price: '$49.99', stocked: true, name: 'Football' }, { category: 'Sporting Goods', price: '$9.99', stocked: true, name: 'Baseball' }, { category: 'Sporting Goods', price: '$29.99', stocked: false, name: 'Basketball' }, { category: 'Electronics', price: '$99.99', stocked: true, name: 'iPod Touch' }, { category: 'Electronics', price: '$399.99', stocked: false, name: 'iPhone 5' }, { category: 'Electronics', price: '$199.99', stocked: true, name: 'Nexus 7' }];
+var TabList = function (_React$Component6) {
+  _inherits(TabList, _React$Component6);
 
-ReactDOM.render(React.createElement(FilterableProductTable, { products: PRODUCTS }), document.getElementById('container'));
+  function TabList() {
+    _classCallCheck(this, TabList);
+
+    return _possibleConstructorReturn(this, (TabList.__proto__ || Object.getPrototypeOf(TabList)).apply(this, arguments));
+  }
+
+  _createClass(TabList, [{
+    key: "render",
+    value: function render() {
+      var rows = [];
+      this.props.sites.forEach(function (thisSite) {
+        rows.push(React.createElement(Site, { site: thisSite, key: thisSite.url }));
+      });
+
+      /*
+                <li className="tab">
+                    <img alt="" className="tab-icon" src="https://www.google.com/favicon.ico"/>
+                    <span className="tab-title">Amazon - AC Charger Power Adapter For ASUS Chromebook Flip C100</span>
+                </li>
+                <li className="tab">
+                    <img alt="" className="tab-icon" src="https://www.google.com/favicon.ico"/>
+                    <span className="tab-title">ReactDOM - React</span>
+                </li>
+      */
+
+      return React.createElement(
+        "ul",
+        { className: "tab-list" },
+        rows
+      );
+    }
+  }]);
+
+  return TabList;
+}(React.Component);
+
+var SuggestedLinks = function (_React$Component7) {
+  _inherits(SuggestedLinks, _React$Component7);
+
+  function SuggestedLinks() {
+    _classCallCheck(this, SuggestedLinks);
+
+    return _possibleConstructorReturn(this, (SuggestedLinks.__proto__ || Object.getPrototypeOf(SuggestedLinks)).apply(this, arguments));
+  }
+
+  _createClass(SuggestedLinks, [{
+    key: "render",
+    value: function render() {
+      return React.createElement(
+        "ul",
+        { className: "group expanded active" },
+        React.createElement(
+          "span",
+          { className: "group-title" },
+          "Suggested Links"
+        ),
+        React.createElement(TabList, { sites: SITES })
+      );
+    }
+  }]);
+
+  return SuggestedLinks;
+}(React.Component);
+
+var SITES = [{ favicon: "https://www.amazon.com/favicon.ico",
+  title: "Amazon - AC Charger Power Adapter For ASUS Chromebook Flip C100",
+  url: "https://www.amazon.ca/Charger-Chromebook-10-1-Inch-Convertible-Touchscreen/dp/B01IXZE6Z8/ref=sr_1_1?ie=UTF8&qid=1488569483&sr=8-1&keywords=chromebook+asus+adapter" }, { favicon: "https://code.facebook.com/favicon.ico",
+  title: 'Thinking in React - React',
+  url: "https://facebook.github.io/react/docs/thinking-in-react.html" }, { favicon: "https://www.reddit.com/favicon.ico",
+  title: 'top scoring links - Reddit',
+  url: "https://www.reddit.com/top/" }];
+
+ReactDOM.render(React.createElement(SuggestedLinks, { sites: SITES }), document.getElementById('container'));
 
