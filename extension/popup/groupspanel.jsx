@@ -7,22 +7,21 @@ class Site extends React.Component {
         });
         let siteSpan = React.DOM.span({className: "tab-title"}, this.props.site.title)
 
-
         return (
-          React.DOM.li(
-            {
-              className: "tab",
-                onClick: (event) => {
-                    event.stopPropagation();
+            React.DOM.li(
+                {
+                    className: "tab",
+                    onClick: (event) => {
+                        event.stopPropagation();
 
-                    let site = this.props.site;
-                    console.log("URL is: " + site.url);
-                    console.log("Got click event");
-                }
-            },
-            favicon,
-            siteSpan
-          )
+                        let site = this.props.site;
+                        console.log("URL is: " + site.url);
+                        console.log("Got click event");
+                    }
+                },
+                favicon,
+                siteSpan
+            )
         );
     }
 }
@@ -40,6 +39,12 @@ class SiteList extends React.Component {
             </ul>
       );
   }
+}
+
+const Actions = {
+  openTab: function(url) {
+    addon.port.emit("Tab:Select", {groupID, tabIndex});
+  },
 }
 
 class SuggestedLinks extends React.Component {
@@ -67,8 +72,12 @@ var SITES = [
 ];
 
 
+var suggestedLinks = React.createElement(SuggestedLinks,
+    {sites:SITES,
+     onClick: Actions.openTab,
+    });
 
 ReactDOM.render(
-  <SuggestedLinks sites={SITES} />,
+  suggestedLinks,
   document.getElementById('container')
 );
