@@ -13,10 +13,10 @@ class Site extends React.Component {
                     className: "tab",
                     onClick: (event) => {
                         event.stopPropagation();
-
                         let site = this.props.site;
-                        console.log("URL is: " + site.url);
-                        console.log("Got click event");
+                        browser.tabs.create({
+                            'url': site.url
+                        });
                     }
                 },
                 favicon,
