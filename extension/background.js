@@ -1,3 +1,11 @@
+function handleMessage(request, sender, sendResponse) {
+  console.log("Message from the content script: " +
+    request.url);
+  sendResponse({response: "Response from background script"});
+}
+
+browser.runtime.onMessage.addListener(handleMessage);
+
 browser.placesdb.query({query: "select id, visit_type from moz_historyvisits limit 10", params: ['id', 'visit_type']}).then(
     function(results) {
         for (var i = 0; i < results.length; i++) {

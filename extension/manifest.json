@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "hello test",
-  "description": "test the simple experiment",
+  "name": "Temporal Suggestions",
+  "description": "Temporal link suggestions. A Context Graph Experiment.",
   "version": "1.0",
   "background": { "scripts": ["background.js"] },
   "permissions": ["experiments.simple",
@@ -18,7 +18,7 @@
           "32": "icons/icon-32.png",
           "64": "icons/icon-64.png"
       },
-      "default_title": "Heatmap Settings",
+      "default_title": "Context Graph Settings",
       "default_popup": "popup/groupspanel.html"
   }
 }

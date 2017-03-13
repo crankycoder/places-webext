@@ -17,6 +17,10 @@ class Site extends React.Component {
                         browser.tabs.create({
                             'url': site.url
                         });
+
+                        var sending = browser.runtime.sendMessage({'url': site.url});
+                        sending.then((message) => {console.log(`Message from the background script:  ${message.response}`);},
+                                     (error) => {console.log(`Error: ${error}`);});
                     }
                 },
                 favicon,
@@ -39,12 +43,6 @@ class SiteList extends React.Component {
             </ul>
       );
   }
-}
-
-const Actions = {
-  openTab: function(url) {
-    addon.port.emit("Tab:Select", {groupID, tabIndex});
-  },
 }
 
 class SuggestedLinks extends React.Component {
@@ -73,9 +71,7 @@ var SITES = [
 
 
 var suggestedLinks = React.createElement(SuggestedLinks,
-    {sites:SITES,
-     onClick: Actions.openTab,
-    });
+    {sites:SITES});
 
 ReactDOM.render(
   suggestedLinks,
