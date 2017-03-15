@@ -1,3 +1,12 @@
+// This just creates a dummy store for us to connect to.
+const store = Redux.createStore(Reducer);
+
+console.log("Reducer: " + Reducer);
+console.log("store: " + store);
+
+browser.runtime.sendMessage({'reducer': Reducer});
+browser.runtime.sendMessage({'store': store});
+
 class Site extends React.Component {
     render() {
         let favicon = React.DOM.img({

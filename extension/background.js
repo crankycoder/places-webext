@@ -1,3 +1,8 @@
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+
 function handleMessage(request, sender, sendResponse) {
   console.log("Message from the content script: " +
     request.url);
