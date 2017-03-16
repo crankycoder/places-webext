@@ -1,6 +1,8 @@
+
+var heatmap = [];
+
 function initHeatmap() {
     console.log("initHeatmap starting");
-    var heatmap = [];
     var loop_counter = 1;
     var limit = 500;
 
@@ -27,6 +29,7 @@ function initHeatmap() {
             var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
 
             historyVisitsPromise.then(function(historyVisits) {
+                console.log(`Fetched ${historyVisits.length} rows from moz_historyvisits`);
                 for (var i = 0; i < historyVisits.length; i++) {
                     var when = new Date(historyVisits[i].visit_date / (10 ** 3));
                     insert_or_append(heatmap, place.url, when);
@@ -49,7 +52,6 @@ function initHeatmap() {
 
     var mozPlacesLooper = function(loop_counter, limit) {
         var sql = `SELECT id, url FROM moz_places LIMIT ${limit} OFFSET ${loop_counter * limit}`;
-        console.log("Querying : " + sql);
         var mozPlacesPromise = browser.placesdb.query({query: sql, params: ["id", "url"]});
         console.log("Iterating over each unique URL in moz_places");
 
@@ -71,10 +73,14 @@ function insert_or_append(map, url, date) {
 }
 
 function handleMessage(request, sender, sendResponse) {
-  initHeatmap();
-  console.log("Message from the content script: " + JSON.stringify(request));
-  sendResponse({response: "Response from background script"});
-
+    if (heatmap.length == 0) {
+        console.log("Initializing the heatmap");
+        initHeatmap();
+    } else {
+        console.log("Heatmap already has data");
+    }
+    console.log("Message from the content script: " + JSON.stringify(request));
+    sendResponse({response: "Response from background script"});
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
