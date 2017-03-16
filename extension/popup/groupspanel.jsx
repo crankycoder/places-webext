@@ -1,11 +1,10 @@
 // This just creates a dummy store for us to connect to.
-const store = Redux.createStore(Reducer);
+// const store = Redux.createStore(Reducer);
 
-console.log("Reducer: " + Reducer);
-console.log("store: " + store);
+//console.log("Reducer: " + Reducer);
+// console.log("store: " + store);
 
-browser.runtime.sendMessage({'reducer': Reducer});
-browser.runtime.sendMessage({'store': store});
+browser.runtime.sendMessage({'type': 'start'});
 
 class Site extends React.Component {
     render() {

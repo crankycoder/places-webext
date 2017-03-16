@@ -19,7 +19,7 @@ function suggestions(state = [], action) {
             return state.concat([{day: action.day, hour: action.hour, url: action.url, rank: action.rank}]);
         case 'REMOVE_LINK':
             // TODO: add persistence hook into the browser here somehow
-            return state.filter(t => !(t.day === action.day && t.hour === action.hour &&& t.url === url));
+            return state.filter(t => !(t.day === action.day && t.hour === action.hour && t.url === url));
         default:
             return state;
     }
