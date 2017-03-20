@@ -33,7 +33,7 @@ function visibilityFilter(state={}, action) {
     }
 }
 
-function suggestionsApp(state={}, action) {
+function heatmapApp(state={}, action) {
     return {suggestions: suggestions(state.suggestions, action),
             visibilityFilter: visibilityFilter(state.visibilityFilter, action)};
 };

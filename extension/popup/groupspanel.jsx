@@ -1,8 +1,11 @@
 // This just creates a dummy store for us to connect to.
-// const store = Redux.createStore(Reducer);
 
-//console.log("Reducer: " + Reducer);
-// console.log("store: " + store);
+const store = Redux.createStore(heatmapApp);
+
+console.log("heatmapApp: " + heatmapApp);
+console.log("store: " + store);
+console.log("connect: " + ReactRedux.connect);
+console.log("Provider: " + ReactRedux.Provider);
 
 browser.runtime.sendMessage({'type': 'start'});
 
@@ -13,7 +16,7 @@ class Site extends React.Component {
             className: "tab-icon",
             src: this.props.site.favicon
         });
-        let siteSpan = React.DOM.span({className: "tab-title"}, this.props.site.title)
+        let siteSpan = React.DOM.span({className: "tab-title"}, this.props.site.title);
 
         return (
             React.DOM.li(
@@ -78,10 +81,14 @@ var SITES = [
 ];
 
 
-var suggestedLinks = React.createElement(SuggestedLinks,
+const App = () => React.createElement(SuggestedLinks,
     {sites:SITES});
 
+var Provider = ReactRedux.Provider;
+
 ReactDOM.render(
-  suggestedLinks,
-  document.getElementById('container')
+    <Provider store={store}>
+        <App />
+    </Provider>
+    ,document.getElementById('container')
 );
