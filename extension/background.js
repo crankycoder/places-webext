@@ -35,7 +35,8 @@ function initHeatmap() {
                     insert_or_append(heatmap, place.url, when);
                 }
             }, function(reason) {
-                // TODO: scanning the moz_historyvisits table didn't work
+                // TODO: add error handling when scanning the moz_historyvisits
+                // table didn't work
             });
         });
 
@@ -64,23 +65,31 @@ function initHeatmap() {
 }
 
 function insert_or_append(map, url, date) {
+    /*
     cell = map[date.getDay()][date.getHours()];
     if (cell[url] === undefined) {
         cell[url] = {"url": url, "count": 0, "when": []};
     }
     cell[url].count += 1;
     cell[url].when.push(date);
+    */
+
+    browser.runtime.sendMessage({type: 'update_store',
+                                 url: url,
+                                 date: date});
 }
 
 function handleMessage(request, sender, sendResponse) {
-    if (heatmap.length == 0) {
-        console.log("Initializing the heatmap");
-        initHeatmap();
-    } else {
-        console.log("Heatmap already has data");
+    if (request.type === 'start') {
+        if (heatmap.length == 0) {
+            console.log("Initializing the heatmap");
+            initHeatmap();
+        } else {
+            console.log("Heatmap already has data");
+        }
+        console.log("Message from the content script: " + JSON.stringify(request));
+        sendResponse({response: "Response from background script"});
     }
-    console.log("Message from the content script: " + JSON.stringify(request));
-    sendResponse({response: "Response from background script"});
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
