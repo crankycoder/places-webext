@@ -29,7 +29,7 @@ function initHeatmap() {
             var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
 
             historyVisitsPromise.then(function(historyVisits) {
-                console.log(`Fetched ${historyVisits.length} rows from moz_historyvisits`);
+                //console.log(`Fetched ${historyVisits.length} rows from moz_historyvisits`);
                 for (var i = 0; i < historyVisits.length; i++) {
                     var when = new Date(historyVisits[i].visit_date / (10 ** 3));
                     insert_or_append(heatmap, place.url, when);
