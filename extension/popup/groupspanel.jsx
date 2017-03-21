@@ -118,25 +118,21 @@ class SiteList extends React.Component {
   }
 }
 
-var SITES = [];
-
 class SuggestedLinks extends React.Component {
   render() {
     return (
         <ul className="group expanded active">
             <span className="group-title">Suggested Links</span>
-            <SiteList sites={SITES} />
+            <SiteList sites={this.props.sites}/>
         </ul>
     );
   }
 }
 
 
-function mapStateToProps(state) {
-    // TODO: try accessing the redux store for data
-    console.log("mapStateToProps invoked.  Suggestions length: " + state.suggestions.length);
-
-    return {sites: [
+const mapStateToProps = (state) => {
+    // Scan the root object for data
+    return { sites: [
         {favicon: "https://www.amazon.com/favicon.ico",
             title: "Amazon - AC Charger Power Adapter For ASUS Chromebook Flip C100",
             url: "https://www.amazon.ca/Charger-Chromebook-10-1-Inch-Convertible-Touchscreen/dp/B01IXZE6Z8/ref=sr_1_1?ie=UTF8&qid=1488569483&sr=8-1&keywords=chromebook+asus+adapter" },
@@ -145,7 +141,8 @@ function mapStateToProps(state) {
             url: "https://facebook.github.io/react/docs/thinking-in-react.html" },
         {favicon: "https://www.reddit.com/favicon.ico",
             title: 'top scoring links - Reddit',
-            url: "https://www.reddit.com/top/"}]};
+            url: "https://www.reddit.com/top/"}]
+    };
 }
 
 const StoreBackedSuggestedLinks = ReactRedux.connect(

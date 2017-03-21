@@ -12,12 +12,26 @@
      }
 
  */
-function suggestions(state = [], action) {
+function suggestions(state = {}, action) {
     switch (action.type) {
         case 'ADD_LINK':
-            var foo = state.concat([{day: action.day, hour: action.hour, url: action.url}]);
-            console.log("concat'd data");
-            return foo;
+            let day = action.day;
+            let hour = action.hour;
+            let url = action.url;
+
+            if (!(day in state)) {
+                state[day] = {};
+            }
+            if (!(hour in state[day])) {
+                state[day][hour] = {};
+            }
+
+            if (!(url in state[day][hour])) {
+                state[day][hour][url] = 1;
+            } else {
+                state[day][hour][url] += 1;
+            }
+            return state;
         case 'REMOVE_LINK':
             // TODO: add persistence hook into the browser here somehow
             return state.filter(t => !(t.day === action.day && t.hour === action.hour && t.url === url));
