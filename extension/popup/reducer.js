@@ -31,10 +31,15 @@ function suggestions(state = {}, action) {
             } else {
                 state[day][hour][url] += 1;
             }
+
+            if (!('titles' in state)) {
+                state['titles'] = {};
+            }
+            state['titles'][url] = action.title;
+
             return state;
-        case 'REMOVE_LINK':
-            // TODO: add persistence hook into the browser here somehow
-            return state.filter(t => !(t.day === action.day && t.hour === action.hour && t.url === url));
+        case 'PRECOMPUTE':
+            browser.runtime.sendMessage({'type': 'PRECOMPUTE', 'action': action});
         default:
             return state;
     }
