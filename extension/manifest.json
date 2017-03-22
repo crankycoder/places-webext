@@ -3,7 +3,9 @@
   "name": "Temporal Suggestions",
   "description": "Temporal link suggestions. A Context Graph Experiment.",
   "version": "1.0",
-  "background": { "scripts": ["background.js", "redux.js"] },
+  "background": { "scripts": [ "vendor/js/redux.js"
+                              ,"lib/js/reducer.js"
+                              ,"background.js"] },
   "permissions": ["experiments.simple",
                   "webRequest", "<all_urls>",
                   "cookies","<all_urls>",
