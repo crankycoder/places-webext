@@ -147,7 +147,9 @@ function handleMessage(request, sender, sendResponse) {
             console.log(`Appending ${sites.length} rows to popup`);
             for (var i = 0; i < sites.length; i++) {
                 let row = sites[i];
-                insert_or_append(row.url, row.title, now);
+                for (var instance = 0; instance < row.count; instance++) {
+                    insert_or_append(row.url, row.title, now);
+                }
             }
             break;
 

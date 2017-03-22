@@ -29,7 +29,8 @@ function handleMessage(request, sender, sendResponse) {
             browser.runtime.sendMessage(payload);
         default:
             // Do nothing
-    } }
+    }
+}
 
 browser.runtime.onMessage.addListener(handleMessage);
 
