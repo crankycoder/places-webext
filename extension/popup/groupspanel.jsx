@@ -10,7 +10,7 @@ class Site extends React.Component {
             className: "tab-icon",
             src: this.props.site.favicon
         });
-        let siteSpan = React.DOM.span({className: "tab-title"}, this.props.site.title);
+        let siteSpan = React.DOM.span({className: "tab-title"}, `${this.props.site.count} ${this.props.site.title}`);
 
         return (
             React.DOM.li(
@@ -88,13 +88,6 @@ const mapStateToProps = (state) => {
         return b.count-a.count;
     });
 
-    /*
-    store.dispatch({type: 'PRECOMPUTE',
-                    rootState: state});
-                    hour: date.getHours(),
-                    sites: sites});
-    */
-
     return {'sites': sites};
 }
 
@@ -146,6 +139,9 @@ function handleMessage(request, sender, sendResponse) {
         case 'DATA_UPDATE':
             let now = new Date();
             // mapStateToProps will effectively filter the data down to just what we want
+            // We're running it twice though.
+            // Once because of the cross JS boundary transport and then again
+            // in the React UI code. Oh well. Good enough for now.
             let storeDict = mapStateToProps(request);
             var sites = storeDict.sites;
             console.log(`Appending ${sites.length} rows to popup`);
