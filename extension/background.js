@@ -101,10 +101,11 @@ function loadHeatmap() {
         var mozPlacesPromise = browser.placesdb.query({query: sql, params: ["id", 'title', "url"]});
 
         mozPlacesPromise.then(placesCallable, function (reason) {
-            /* Querying moz_places failed for some reason */
+            console.log("Error: `${reason}`");
         });
-    }
+    };
 
+    console.log("Starting fetch from moz_places");
     mozPlacesLooper(loop_counter, limit);
 }
 
