@@ -22,10 +22,12 @@ function handleMessage(request, sender, sendResponse) {
              * We need to copy over the suggestions for this day/hour
              * and all the titles for the urls in that list.
              */
+            console.log("background.js saw REQUEST_DATA message");
             console.log("Trying to send the data over the wire over to the popup");
             let payload = {'type': 'DATA_UPDATE',
                            'suggestions': store.getState().suggestions};
             browser.runtime.sendMessage(payload);
+            sendResponse({'status': 'ok'});
         default:
             // Do nothing
     }
@@ -65,7 +67,6 @@ function loadHeatmap() {
             var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
 
             historyVisitsPromise.then(function(historyVisits) {
-                console.log(`Loading history visits`);
                 for (var i = 0; i < historyVisits.length; i++) {
                     var when = new Date(historyVisits[i].visit_date / (10 ** 3));
                     insert_or_append(place.url, place.title,when);
@@ -90,7 +91,7 @@ function loadHeatmap() {
             sending.then(function(msg) {
                 console.log("Success!  The popup was open and notified!");
             }, function (err) {
-                console.log("IgnorableWarning Can't send message to endpoint");
+                console.log("IgnorableWarning Data load is finished");
             });
 
         }

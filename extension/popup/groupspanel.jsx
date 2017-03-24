@@ -132,6 +132,10 @@ function insert_or_append(url, title, date) {
 // Declare and register the message handler
 function handleMessage(request, sender, sendResponse) {
     switch (request.type) {
+        case 'REQUEST_DATA':
+            // This is supposed to be handled by background.js
+            console.log("groupspanel.jsx saw REQUEST_DATA message");
+            break;
         case 'DATA_READY':
             requestLatestData();
             break;
@@ -159,4 +163,11 @@ function handleMessage(request, sender, sendResponse) {
 
 browser.runtime.onMessage.addListener(handleMessage);
 
-browser.runtime.sendMessage({'type': 'REQUEST_DATA'});
+var sending = browser.runtime.sendMessage({'type': 'REQUEST_DATA'});
+sending.then(function(resp) {
+    console.log("Message from background script: " + JSON.stringify(resp));
+
+},
+function(err) {
+    console.log(`Error sending message ${err}`);
+});
