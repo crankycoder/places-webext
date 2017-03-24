@@ -18,7 +18,6 @@ function loadGuard() {
 function handleMessage(request, sender, sendResponse) {
     switch (request.type) {
         case 'REQUEST_DATA':
-            // TODO: send the data for the datastore over
             /*
              * We need to copy over the suggestions for this day/hour
              * and all the titles for the urls in that list.
@@ -66,14 +65,14 @@ function loadHeatmap() {
             var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
 
             historyVisitsPromise.then(function(historyVisits) {
-                //console.log(`Fetched ${historyVisits.length} rows from moz_historyvisits`);
+                console.log(`Loading history visits`);
                 for (var i = 0; i < historyVisits.length; i++) {
                     var when = new Date(historyVisits[i].visit_date / (10 ** 3));
                     insert_or_append(place.url, place.title,when);
                 }
+                console.log(`Loaded ${historyVisits.length} rows from moz_historyvisits`);
             }, function(reason) {
-                // TODO: add error handling when scanning the moz_historyvisits
-                // table didn't work
+                 console.log(`Error ${reason}`);
             });
         });
 
