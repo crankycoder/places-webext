@@ -32,8 +32,12 @@ var Site = function (_React$Component) {
                 className: "tab-icon",
                 src: this.props.site.favicon
             });
-            var siteSpan = React.DOM.span({ className: "tab-title" }, "" + this.props.site.title);
-
+            var normalized_title = this.props.site.title;
+            if (normalized_title === null) {
+                normalized_title = this.props.site.url;
+                console.log("Normalizing " + this.props.site.title + " to " + this.props.site.url);
+            }
+            var siteSpan = React.createElement('span', { className: "tab-title" }, "" + normalized_title);
             return React.DOM.li({
                 className: "tab",
                 onClick: function onClick(event) {

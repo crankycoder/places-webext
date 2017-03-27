@@ -82,12 +82,31 @@ function computeResults() {
     promiseCachedResults.then((success) => {
         console.log(`Promise cache computed: ${success}`);
 
+        let now = new Date();
+        let day = now.getDay();
+        let hour = now.getHours();
+        sendCachedData(day, hour);
         var timerId = setTimeout(computeResults, 5 * 60 * 1000);
         console.log(`Set the next timer to run with timerId: ${timerId}`);
 
     }, (err) => {
         console.log(`Error: ${err}`);
     });
+}
+
+function sendCachedData(day, hour) {
+    let day_result = CACHED_RESULT[day];
+    if (day_result === undefined) {
+        return false;
+    }
+    let hour_result = CACHED_RESULT[day][hour];
+    if (hour_result === undefined) {
+        return false;
+    }
+    let payload = {'type': 'DATA_UPDATE',
+        'suggestions': hour_result};
+    console.log(`background.js found data: ${hour_result}`)
+    browser.runtime.sendMessage(payload);
 }
 
 function handleMessage(request, sender, sendResponse) {
@@ -102,23 +121,13 @@ function handleMessage(request, sender, sendResponse) {
 
             let day = request.day;
             let hour = request.hour;
-            let day_result = CACHED_RESULT[day];
-            if (day_result === undefined) {
+
+            if (!sendCachedData(day, hour)) {
                 sendResponse({status: 'ok',
-                              result: 'no data'});
-                break;
+                    result: 'no data'});
+            } else {
+                sendResponse({'status': 'ok'});
             }
-            let hour_result = CACHED_RESULT[day][hour];
-            if (hour_result === undefined) {
-                sendResponse({status: 'ok',
-                              result: 'no data'});
-                break;
-            }
-            let payload = {'type': 'DATA_UPDATE',
-                           'suggestions': hour_result};
-            console.log(`background.js found data: ${hour_result}`)
-            browser.runtime.sendMessage(payload);
-            sendResponse({'status': 'ok'});
             break;
         default:
             // Do nothing

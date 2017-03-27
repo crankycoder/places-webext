@@ -10,8 +10,14 @@ class Site extends React.Component {
             className: "tab-icon",
             src: this.props.site.favicon
         });
-        let siteSpan = React.DOM.span({className: "tab-title"}, `${this.props.site.title}`);
-
+        let normalized_title = this.props.site.title;
+        if (normalized_title === null) {
+            normalized_title = this.props.site.url;
+            console.log(`Normalizing ${this.props.site.title} to ${this.props.site.url}`)
+        }
+        let siteSpan = React.createElement('span',
+                                       {className: "tab-title"},
+                                       `${normalized_title}`);
         return (
             React.DOM.li(
                 {
