@@ -38,6 +38,10 @@ function computeResults() {
         sites.sort(function(a, b) {
             return b.count-a.count;
         });
+        if (sites.length > 30) {
+            console.log("Truncating suggestions list down to 30");
+            sites = sites.slice(0, 30);
+        }
 
         console.log(`Filtered suggestions down to: ${sites}`);
         return {'sites': sites};
