@@ -2,19 +2,85 @@ const store = Redux.createStore(heatmapApp);
 var Provider = ReactRedux.Provider;
 
 var DATA_LOADED = false;
+var CACHED_RESULT = {};
 
 function loadGuard() {
     if (DATA_LOADED) {
         console.log("Data is already loaded.");
-        return 'DATA_READY';
+        return;
     }
     DATA_LOADED = true;
     // We want to load the data once and only once
-    console.log("Data load requested to the popup");
     loadHeatmap();
-    return 'DATA_LOADING';
 }
 
+function computeResults() {
+    let suggestionsFilter = (suggestions, day, hour) => {
+        let day_data = suggestions[day];
+        if (day_data === undefined) {
+            console.log("No data for today");
+            return { sites: [] };
+        }
+        let hour_data = day_data[hour];
+        if (hour_data === undefined) {
+            console.log("No data for this hour of day");
+            return { sites: [] };
+        }
+
+        // Scan the root object for data
+        let urls = Object.keys(hour_data);
+        var sites = [];
+        for (var i = 0; i < urls.length; i++) {
+            let thisUrl = urls[i];
+            let title = suggestions['titles'][thisUrl];
+            sites.push({favicon:"", title: title, url: thisUrl, count: hour_data[thisUrl]});
+        }
+        sites.sort(function(a, b) {
+            return b.count-a.count;
+        });
+
+        console.log(`Filtered suggestions down to: ${sites}`);
+        return {'sites': sites};
+    };
+
+    var promiseCachedResults = new Promise((resolve, reject) => {
+        setTimeout(function() {
+            let now = new Date();
+            let day = now.getDay();
+            let hour = now.getHours();
+            console.log(`Computing cached results for [${day}][${hour}]`);
+
+            let day_result = CACHED_RESULT[day];
+            if (day_result === undefined) {
+                CACHED_RESULT[day] = {};
+            }
+            let hour_result = CACHED_RESULT[day][hour];
+            if (hour_result === undefined) {
+                let suggestions = store.getState().suggestions;
+                sitesDict = suggestionsFilter(suggestions, day, hour);
+
+                // Clear out the old cached results
+                for (var prop in CACHED_RESULT) {
+                    if (CACHED_RESULT.hasOwnProperty(prop)) {
+                        delete CACHED_RESULT[prop];
+                    }
+                }
+                CACHED_RESULT[day] = {};
+                CACHED_RESULT[day][hour] = sitesDict.sites;
+            }
+            resolve('ok');
+        }, 1000);
+    });
+
+    // Go off, compute the data and send it back to the
+    console.log("Starting to run promise to compute cached results");
+    promiseCachedResults.then((success) => {
+        console.log(`Promise cache computed: ${success}`);
+    }, (err) => {
+        console.log(`Error: ${err}`);
+    });
+
+}
 function handleMessage(request, sender, sendResponse) {
     switch (request.type) {
         case 'REQUEST_DATA':
@@ -24,16 +90,32 @@ function handleMessage(request, sender, sendResponse) {
              */
             console.log("background.js saw REQUEST_DATA message");
             console.log("Trying to send the data over the wire over to the popup");
+
+            let day = request.day;
+            let hour = request.hour;
+            let day_result = CACHED_RESULT[day];
+            if (day_result === undefined) {
+                sendResponse({status: 'ok',
+                              result: 'no data'});
+                break;
+            }
+            let hour_result = CACHED_RESULT[day][hour];
+            if (hour_result === undefined) {
+                sendResponse({status: 'ok',
+                              result: 'no data'});
+                break;
+            }
             let payload = {'type': 'DATA_UPDATE',
-                           'suggestions': store.getState().suggestions};
+                           'suggestions': hour_result};
+            console.log(`background.js found data: ${hour_result}`)
             browser.runtime.sendMessage(payload);
             sendResponse({'status': 'ok'});
+            break;
         default:
             // Do nothing
     }
 }
 
-browser.runtime.onMessage.addListener(handleMessage);
 
 /**********************************************/
 // Loading of the heatmap data starts here
@@ -85,15 +167,8 @@ function loadHeatmap() {
             mozPlacesLooper(loop_counter, limit);
         } else {
             // We're done - no need to call mozPlacesLooper again
-            // Technically, we aren't *really* done.  There may instances of
-            // placesCallable and mozPlacesLooper that are still running.
-            var sending = browser.runtime.sendMessage({'type': 'DATA_READY'});
-            sending.then(function(msg) {
-                console.log("Success!  The popup was open and notified!");
-            }, function (err) {
-                console.log("IgnorableWarning Data load is finished");
-            });
-
+            console.log("Data load is finished");
+            computeResults();
         }
     };
 
@@ -112,4 +187,6 @@ function loadHeatmap() {
 
 
 // Kick off the data load
+browser.runtime.onMessage.addListener(handleMessage);
+console.log("Registered handleMessage listener");
 loadGuard();

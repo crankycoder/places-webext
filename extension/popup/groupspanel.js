@@ -32,7 +32,7 @@ var Site = function (_React$Component) {
                 className: "tab-icon",
                 src: this.props.site.favicon
             });
-            var siteSpan = React.DOM.span({ className: "tab-title" }, this.props.site.count + " " + this.props.site.title);
+            var siteSpan = React.DOM.span({ className: "tab-title" }, "" + this.props.site.title);
 
             return React.DOM.li({
                 className: "tab",
@@ -115,13 +115,20 @@ var mapStateToProps = function mapStateToProps(state) {
 
     var day_data = suggestions[day];
     if (day_data === undefined) {
-        console.log("No data for today");
-        return { sites: [] };
+        console.log("groupspanel: No data for today");
+
+        return { sites: [{ favicon: "",
+                title: "Data is still processing",
+                url: "about:newpage",
+                count: 0 }] };
     }
     var hour_data = day_data[hour];
     if (hour_data === undefined) {
-        console.log("No data for this hour of day");
-        return { sites: [] };
+        console.log("groupspanel: No data for this hour of day");
+        return { sites: [{ favicon: "",
+                title: "Data is still processing",
+                url: "about:newpage",
+                count: 0 }] };
     }
 
     // Scan the root object for data
@@ -181,37 +188,25 @@ function handleMessage(request, sender, sendResponse) {
             // This is supposed to be handled by background.js
             console.log("groupspanel.jsx saw REQUEST_DATA message");
             break;
-        case 'DATA_READY':
-            requestLatestData();
-            break;
-
         case 'DATA_UPDATE':
             var now = new Date();
             // mapStateToProps will effectively filter the data down to just what we want
             // We're running it twice though.
             // Once because of the cross JS boundary transport and then again
             // in the React UI code. Oh well. Good enough for now.
-            var storeDict = mapStateToProps(request);
-            var sites = storeDict.sites;
+            var sites = request.suggestions;
             console.log("Appending " + sites.length + " rows to popup");
             for (var i = 0; i < sites.length; i++) {
                 var row = sites[i];
-                for (var instance = 0; instance < row.count; instance++) {
-                    insert_or_append(row.url, row.title, now);
-                }
+                // TODO: We're going to ignore the count for now
+                insert_or_append(row.url, row.title, now);
             }
             break;
-
         default:
     }
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
 
-var sending = browser.runtime.sendMessage({ 'type': 'REQUEST_DATA' });
-sending.then(function (resp) {
-    console.log("Message from background script: " + JSON.stringify(resp));
-}, function (err) {
-    console.log("Error sending message " + err);
-});
+requestLatestData();
 
