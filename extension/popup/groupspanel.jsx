@@ -28,8 +28,8 @@ class Site extends React.Component {
                 siteSpan
             )
         );
+        }
     }
-}
 
 class SiteList extends React.Component {
   render() {

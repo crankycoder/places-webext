@@ -1,6 +1,7 @@
 const store = Redux.createStore(heatmapApp);
 var Provider = ReactRedux.Provider;
 
+const MAX_RESULT_LENGTH = 50;
 var DATA_LOADED = false;
 var CACHED_RESULT = {};
 
@@ -38,12 +39,12 @@ function computeResults() {
         sites.sort(function(a, b) {
             return b.count-a.count;
         });
-        if (sites.length > 30) {
-            console.log("Truncating suggestions list down to 30");
-            sites = sites.slice(0, 30);
+        if (sites.length > MAX_RESULT_LENGTH) {
+            console.log(`Truncating suggestions list down to ${MAX_RESULT_LENGTH}`);
+            sites = sites.slice(0, MAX_RESULT_LENGTH);
         }
 
-        console.log(`Filtered suggestions down to: ${sites}`);
+        console.log(`Filtered suggestions down to: ${sites.length} items`);
         return {'sites': sites};
     };
 
@@ -87,8 +88,6 @@ function computeResults() {
     }, (err) => {
         console.log(`Error: ${err}`);
     });
-
-
 }
 
 function handleMessage(request, sender, sendResponse) {
@@ -148,47 +147,62 @@ function loadHeatmap() {
 
     var loop_counter = 0;
 
-    var placesCallable = function(places) {
-        var places_length = places.length;
-        console.log(`Fetched ${places_length} rows from moz_places`);
-
-        places.forEach(function(place) {
-            var placeClause = `WHERE place_id = ${place.id}`;
-            var query = "SELECT id, visit_date, visit_type FROM moz_historyvisits " + placeClause;
-
-            var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
-
-            historyVisitsPromise.then(function(historyVisits) {
-                for (var i = 0; i < historyVisits.length; i++) {
-                    var when = new Date(historyVisits[i].visit_date / (10 ** 3));
-                    insert_or_append(place.url, place.title,when);
-                }
-                console.log(`Loaded ${historyVisits.length} rows from moz_historyvisits`);
-            }, function(reason) {
-                 console.log(`Error ${reason}`);
-            });
-        });
-
-        // ******************
-
-        if (places_length == limit) {
-            // Run another iteration over moz_places as we haven't reached the end of the places table.
-            loop_counter += 1;
-            mozPlacesLooper(loop_counter, limit);
-        } else {
-            // We're done - no need to call mozPlacesLooper again
-            console.log("Data load is finished");
-            computeResults();
-        }
-    };
-
     var mozPlacesLooper = function(loop_counter, limit) {
+        console.log("Starting mozPlaces looper");
         var sql = `SELECT id, title, url FROM moz_places LIMIT ${limit} OFFSET ${loop_counter * limit}`;
         var mozPlacesPromise = browser.placesdb.query({query: sql, params: ["id", 'title', "url"]});
 
-        mozPlacesPromise.then(placesCallable, function (reason) {
-            console.log("Error: `${reason}`");
+        mozPlacesPromise.then(function(places) {
+            var placesPromise = new Promise((resolve, reject) => {
+                var places_length = places.length;
+                console.log(`Fetched ${places_length} rows from moz_places`);
+
+                places.forEach(function(place) {
+                    var placeClause = `WHERE place_id = ${place.id}`;
+                    var query = "SELECT id, visit_date, visit_type FROM moz_historyvisits " + placeClause;
+
+                    var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});
+
+                    historyVisitsPromise.then(function(historyVisits) {
+                        for (var i = 0; i < historyVisits.length; i++) {
+                            var when = new Date(historyVisits[i].visit_date / (10 ** 3));
+                            insert_or_append(place.url, place.title,when);
+                        }
+                        //console.log(`Loaded ${historyVisits.length} rows from moz_historyvisits`);
+                    }, function(reason) {
+                        console.log(`Error ${reason}`);
+                    });
+                });
+
+                // ******************
+
+                if (places_length == limit) {
+                    // Run another iteration over moz_places as we haven't reached the end of the places table.
+                    loop_counter += 1;
+                    resolve({continue: true,
+                        loop_counter: loop_counter,
+                        limit: limit});
+                } else {
+                    // We're done - no need to call mozPlacesLooper again
+                    console.log("Data load is finished");
+                    resolve({continue: false});
+                }
+            });
+
+            placesPromise.then((success) => {
+                if (success.continue) {
+                    mozPlacesLooper(success.loop_counter, success.limit);
+                } else  {
+                    computeResults();
+                }
+            },
+                (err) => {
+                    console.log(`Error in placesPromise: ${err}`);
+                });
+        }, function (reason) {
+            console.log("Error with mozPlacesPromise: `${reason}`");
         });
+        console.log("Ended mozPlaces looper");
     };
 
     console.log("Starting fetch from moz_places");
