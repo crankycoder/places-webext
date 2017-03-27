@@ -80,11 +80,17 @@ function computeResults() {
     console.log("Starting to run promise to compute cached results");
     promiseCachedResults.then((success) => {
         console.log(`Promise cache computed: ${success}`);
+
+        var timerId = setTimeout(computeResults, 5 * 60 * 1000);
+        console.log(`Set the next timer to run with timerId: ${timerId}`);
+
     }, (err) => {
         console.log(`Error: ${err}`);
     });
 
+
 }
+
 function handleMessage(request, sender, sendResponse) {
     switch (request.type) {
         case 'REQUEST_DATA':
