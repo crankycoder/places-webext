@@ -1,7 +1,7 @@
 const store = Redux.createStore(heatmapApp);
 var Provider = ReactRedux.Provider;
 
-const MAX_RESULT_LENGTH = 50;
+const MAX_RESULT_LENGTH = 10;
 var DATA_LOADED = false;
 var CACHED_RESULT = {};
 
@@ -175,6 +175,10 @@ function loadHeatmap() {
                     historyVisitsPromise.then(function(historyVisits) {
                         for (var i = 0; i < historyVisits.length; i++) {
                             var when = new Date(historyVisits[i].visit_date / (10 ** 3));
+                            if (place.title === null) {
+                                // Skip over any entries with null titles
+                                continue;
+                            }
                             insert_or_append(place.url, place.title,when);
                         }
                         //console.log(`Loaded ${historyVisits.length} rows from moz_historyvisits`);
