@@ -10,8 +10,14 @@ class Site extends React.Component {
             className: "tab-icon",
             src: this.props.site.favicon
         });
-        let siteSpan = React.DOM.span({className: "tab-title"}, `${this.props.site.count} ${this.props.site.title}`);
-
+        let normalized_title = this.props.site.title;
+        if (normalized_title === null) {
+            normalized_title = this.props.site.url;
+            console.log(`Normalizing ${this.props.site.title} to ${this.props.site.url}`)
+        }
+        let siteSpan = React.createElement('span',
+                                       {className: "tab-title"},
+                                       `${normalized_title}`);
         return (
             React.DOM.li(
                 {
@@ -28,8 +34,8 @@ class Site extends React.Component {
                 siteSpan
             )
         );
+        }
     }
-}
 
 class SiteList extends React.Component {
   render() {
@@ -67,13 +73,20 @@ const mapStateToProps = (state) => {
 
     let day_data = suggestions[day];
     if (day_data === undefined) {
-        console.log("No data for today");
-        return { sites: [] };
+        console.log("groupspanel: No data for today");
+
+        return {sites: [{favicon:"",
+                         title: "Data is still processing",
+                         url: "about:newpage",
+                         count: 0}]};
     }
     let hour_data = day_data[hour];
     if (hour_data === undefined) {
-        console.log("No data for this hour of day");
-        return { sites: [] };
+        console.log("groupspanel: No data for this hour of day");
+        return {sites: [{favicon:"",
+                         title: "Data is still processing",
+                         url: "about:newpage",
+                         count: 0}]};
     }
 
     // Scan the root object for data
@@ -132,31 +145,28 @@ function insert_or_append(url, title, date) {
 // Declare and register the message handler
 function handleMessage(request, sender, sendResponse) {
     switch (request.type) {
-        case 'DATA_READY':
-            requestLatestData();
+        case 'REQUEST_DATA':
+            // This is supposed to be handled by background.js
+            console.log("groupspanel.jsx saw REQUEST_DATA message");
             break;
-
         case 'DATA_UPDATE':
             let now = new Date();
             // mapStateToProps will effectively filter the data down to just what we want
             // We're running it twice though.
             // Once because of the cross JS boundary transport and then again
             // in the React UI code. Oh well. Good enough for now.
-            let storeDict = mapStateToProps(request);
-            var sites = storeDict.sites;
+            var sites = request.suggestions;
             console.log(`Appending ${sites.length} rows to popup`);
             for (var i = 0; i < sites.length; i++) {
                 let row = sites[i];
-                for (var instance = 0; instance < row.count; instance++) {
-                    insert_or_append(row.url, row.title, now);
-                }
+                // TODO: We're going to ignore the count for now
+                insert_or_append(row.url, row.title, now);
             }
             break;
-
         default:
     }
 }
 
 browser.runtime.onMessage.addListener(handleMessage);
 
-browser.runtime.sendMessage({'type': 'REQUEST_DATA'});
+requestLatestData();
