@@ -35,6 +35,7 @@ function computeResults() {
             let thisUrl = urls[i];
             let title = suggestions['titles'][thisUrl];
             sites.push({favicon:"", title: title, url: thisUrl, count: hour_data[thisUrl]});
+            console.log(JSON.stringify({favicon:"", title: title, url: thisUrl, count: hour_data[thisUrl]}));
         }
         sites.sort(function(a, b) {
             return b.count-a.count;
@@ -45,6 +46,7 @@ function computeResults() {
         }
 
         console.log(`Filtered suggestions down to: ${sites.length} items`);
+        console.log("Filtered suggestions: " + JSON.stringify(sites));
         return {'sites': sites};
     };
 
@@ -167,7 +169,7 @@ function loadHeatmap() {
                 console.log(`Fetched ${places_length} rows from moz_places`);
 
                 places.forEach(function(place) {
-                    var placeClause = `WHERE place_id = ${place.id}`;
+                    var placeClause = `WHERE place_id = ${place.id} and visit_type <= 3`;
                     var query = "SELECT id, visit_date, visit_type FROM moz_historyvisits " + placeClause;
 
                     var historyVisitsPromise  = browser.placesdb.query({query: query, params: ['id', 'visit_date', 'visit_type']});

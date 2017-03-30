@@ -13,12 +13,32 @@
 
  */
 function suggestions(state = {}, action) {
+    var day = action.day;
+    var hour = action.hour;
+    var url = action.url;
     switch (action.type) {
-        case 'ADD_LINK':
-            let day = action.day;
-            let hour = action.hour;
-            let url = action.url;
+        case 'UI_ADD_LINK':
+            let count = action.count;
 
+            if (!(day in state)) {
+                state[day] = {};
+            }
+            if (!(hour in state[day])) {
+                state[day][hour] = {};
+            }
+
+            if (!(url in state[day][hour])) {
+                state[day][hour][url] = count;
+            }
+
+            if (!('titles' in state)) {
+                state['titles'] = {};
+            }
+            state['titles'][url] = action.title;
+
+            return state;
+            break;
+        case 'ADD_LINK':
             if (!(day in state)) {
                 state[day] = {};
             }
@@ -38,8 +58,10 @@ function suggestions(state = {}, action) {
             state['titles'][url] = action.title;
 
             return state;
+            break;
         case 'PRECOMPUTE':
             browser.runtime.sendMessage({'type': 'PRECOMPUTE', 'action': action});
+            break;
         default:
             return state;
     }

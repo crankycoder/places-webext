@@ -37,7 +37,7 @@ var Site = function (_React$Component) {
                 normalized_title = this.props.site.url;
                 console.log("Normalizing " + this.props.site.title + " to " + this.props.site.url);
             }
-            var siteSpan = React.createElement('span', { className: "tab-title" }, "" + normalized_title);
+            var siteSpan = React.createElement('span', { className: "tab-title" }, this.props.site.count + " " + normalized_title);
             return React.DOM.li({
                 className: "tab",
                 onClick: function onClick(event) {
@@ -176,12 +176,13 @@ function requestLatestData() {
     browser.runtime.sendMessage(payload);
 }
 
-function insert_or_append(url, title, date) {
-    store.dispatch({ type: 'ADD_LINK',
+function insert_or_append(url, title, date, count) {
+    store.dispatch({ type: 'UI_ADD_LINK',
         day: date.getDay(),
         hour: date.getHours(),
         url: url,
-        title: title
+        title: title,
+        count: count
     });
 }
 
@@ -200,10 +201,11 @@ function handleMessage(request, sender, sendResponse) {
             // in the React UI code. Oh well. Good enough for now.
             var sites = request.suggestions;
             console.log("Appending " + sites.length + " rows to popup");
+            console.log("Popup Received " + JSON.stringify(sites));
             for (var i = 0; i < sites.length; i++) {
                 var row = sites[i];
                 // TODO: We're going to ignore the count for now
-                insert_or_append(row.url, row.title, now);
+                insert_or_append(row.url, row.title, now, row.count);
             }
             break;
         default:
